@@ -18,6 +18,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Create the SQLAlchemy db instance
 db = SQLAlchemy(app)
 
+from models import Users
+
+
+
+
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
