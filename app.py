@@ -9,6 +9,8 @@ from pathlib import Path
 import logging
 
 
+
+
 # Load environment variables from .env file
 load_dotenv(dotenv_path=Path('.') / '.env', override=True)
 app = Flask(__name__)
@@ -25,7 +27,7 @@ db.init_app(app)
 ma = Marshmallow(app)
 
 # Import Users from models
-from .models.models import Users
+from .models.models import Users, user_schema
 
 
 # Configure logging
@@ -50,30 +52,12 @@ def useradd():
     db.session.add(users)
     db.session.commit()
     
-    return jsonify({"success": "Successful Post"})
+    # return jsonify({"success": "Successful Post"})
+    return user_schema.jsonify(users)
 
 
-@app.route('/check_db_connection', methods=['GET'])
-def check_db_connection():
-    try:
-        # Execute a simple query to check the connection
-        db.session.execute(text('SELECT 1'))
-        return jsonify({'message': 'Database connection successful'})
-    except Exception as e:
-        app.logger.error(f"Database connection failed: {str(e)}")
-        return jsonify({'message': 'Database connection failed', 'error': str(e)})
-
-@app.route('/check_tables', methods=['GET'])
-def check_tables():
-    try:
-        inspector = inspect(db.engine)
-        tables = inspector.get_table_names()
-        if tables:
-            return jsonify({'message': 'Tables exist', 'tables': tables})
-        else:
-            return jsonify({'message': 'No tables found'})
-    except Exception as e:
-        return jsonify({'message': 'Failed to check tables', 'error': str(e)})
+from .db_conn_check import db_conn_check_bp
+app.register_blueprint(db_conn_check_bp)
 
 if __name__ == '__main__':
     app.debug = True
