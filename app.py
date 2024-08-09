@@ -62,6 +62,12 @@ def allUsers():
     return jsonify(res)
     # return users_schema.jsonify(users)
 
+@app.route("/user/<id>", methods=["GET"])
+def getUser(id):
+    user = Users.query.get(id)
+    if user is None:
+        return jsonify({"message": "User not found"})
+    return user_schema.jsonify(user)
 
 from .db_conn_check import db_conn_check_bp
 app.register_blueprint(db_conn_check_bp)
