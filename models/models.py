@@ -1,7 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 import datetime
+from ..app import db, ma
 
-db = SQLAlchemy()
 
 
 class Users(db.Model):
@@ -14,3 +13,10 @@ class Users(db.Model):
     def __init__(self, name, email):
         self.name = name
         self.email = email
+        
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'email', 'date')  # fields to expose
+
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)

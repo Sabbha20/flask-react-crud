@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from dotenv import load_dotenv
 from sqlalchemy import text,inspect
+from flask_marshmallow import Marshmallow
 import os
 from pathlib import Path
 import logging
-from .models.models import db, Users
+
 
 # Load environment variables from .env file
 load_dotenv(dotenv_path=Path('.') / '.env', override=True)
@@ -17,9 +19,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+mysqlconnector://{os.getenv('MYS
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # print(f"connection url:\t{app.config['SQLALCHEMY_DATABASE_URI']}")
-
+db = SQLAlchemy()
 # Initialize the database with the app
 db.init_app(app)
+ma = Marshmallow(app)
+
+# Import Users from models
+from .models.models import Users
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
