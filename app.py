@@ -27,7 +27,7 @@ db.init_app(app)
 ma = Marshmallow(app)
 
 # Import Users from models
-from .models.models import Users, user_schema
+from .models.models import Users, user_schema, users_schema
 
 
 # Configure logging
@@ -54,6 +54,13 @@ def useradd():
     
     # return jsonify({"success": "Successful Post"})
     return user_schema.jsonify(users)
+
+@app.route("/allUsers", methods=["GET"])
+def allUsers():
+    users = Users.query.all()
+    res = users_schema.dump(users)
+    return jsonify(res)
+    # return users_schema.jsonify(users)
 
 
 from .db_conn_check import db_conn_check_bp
