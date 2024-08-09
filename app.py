@@ -16,7 +16,7 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+mysqlconnector://{os.getenv('MYSQL_USER')}:{os.getenv('MYSQL_PASSWORD')}@{os.getenv('MYSQL_HOST')}:3306/{os.getenv('MYSQL_DB')}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-print(f"connection url:\t{app.config['SQLALCHEMY_DATABASE_URI']}")
+# print(f"connection url:\t{app.config['SQLALCHEMY_DATABASE_URI']}")
 
 # Initialize the database with the app
 db.init_app(app)
@@ -24,28 +24,6 @@ db.init_app(app)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-
-def create_or_update_tables():
-    try:
-        inspector = inspect(db.engine)
-        db.create_all()
-        logger.info('Tables created successfully')
-
-        for table_name in db.metadata.tables.keys():
-            if inspector.has_table(table_name):
-                columns_in_db = {column['name'] for column in inspector.get_columns(table_name)}
-                model_columns = {column.name for column in db.metadata.tables[table_name].columns}
-                new_columns = model_columns - columns_in_db
-
-                for column in new_columns:
-                    column_obj = db.metadata.tables[table_name].columns[column]
-                    db.engine.execute(f'ALTER TABLE {table_name} ADD COLUMN {column_obj.compile(dialect=db.engine.dialect)}')
-                logger.info(f'Table {table_name} updated successfully')
-    except Exception as e:
-        logger.error(f'Error creating/updating tables: {str(e)}')
-
-
 
 @app.route("/")
 def hello_world():
@@ -87,7 +65,5 @@ def check_tables():
         return jsonify({'message': 'Failed to check tables', 'error': str(e)})
 
 if __name__ == '__main__':
-    with app.app_context():
-        create_or_update_tables()
     app.debug = True
     app.run()
