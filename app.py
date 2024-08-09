@@ -39,6 +39,10 @@ def useradd():
     name = request.json["name"]
     email = request.json["email"]
     
+    users = Users(name, email)
+    db.session.add(users)
+    db.session.commit()
+    
     return jsonify({"success": "Successful Post"})
 
 
